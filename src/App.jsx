@@ -16,10 +16,13 @@ import { SearchBar } from "./components/searchBar/SearchBar";
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
 import { AddProduct } from "./pages/admin/AddProduct";
 import { EditProduct } from "./components/admin/EditProduct";
+import { MyState } from "./context/myState";
+import { Toaster } from "react-hot-toast";
+
 
 const App = () => {
   return (
-    <div>
+    <MyState>
       <Router>
         <ScrollTop />
         <Routes>
@@ -36,8 +39,9 @@ const App = () => {
           <Route path="/editProduct" element={<EditProduct />} />
           <Route path="/*" element={<NoPage />} />
         </Routes>
+        <Toaster />
       </Router>
-    </div>
+    </MyState>
   );
 }
 
