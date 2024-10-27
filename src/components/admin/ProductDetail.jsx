@@ -6,9 +6,11 @@ const ProductDetail = () => {
                 {/* text  */}
                 <h1 className=" text-xl text-dark font-bold">All Product</h1>
                 {/* Add Product Button  */}
-                <button className="px-5 py-2 bg-dark border hover:bg-primary text-white rounded-lg">
-                    <Link to={'/addProduct'}>Add Product</Link>
-                </button>
+                <Link to={'/addProduct'}>
+                    <button className="px-5 py-2 bg-dark border hover:bg-primary text-white rounded-lg">
+                        Add Product
+                    </button>
+                </Link>
             </div>
 
             {/* table  */}
