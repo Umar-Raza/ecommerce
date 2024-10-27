@@ -7,6 +7,7 @@ module.exports = withMT({
       'dark': '#433878',
       'primary': '#7E60BF',
       'light': '#FFE1FF',
+      'plane': '#E5D9F2'
 
 
     },
