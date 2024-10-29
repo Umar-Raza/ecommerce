@@ -9,7 +9,7 @@ export const Home = () => {
         <Layout>
             <HeroSection />
             <HomePageProductCard />
-           <Loader/>
+       
         </Layout>
     )
 }
