@@ -1,4 +1,4 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { SearchBar } from "../searchBar/SearchBar";
 import { Button, IconButton } from "@material-tailwind/react";
 // import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -7,6 +7,16 @@ import { Button, IconButton } from "@material-tailwind/react";
 
 
 export const Navbar = () => {
+  const user = JSON.parse(localStorage.getItem('user'))
+  // console.log(user)
+  const navigate = useNavigate()
+  // logout
+  const logout = () => {
+    localStorage.clear(user)
+    navigate('/login')
+  }
+
+
   // navList Data
   const navList = (
     <ul className="flex space-x-3 text-white font-medium text-md px-5 ">
@@ -19,22 +29,25 @@ export const Navbar = () => {
         <NavLink to={'/allproduct'}>All Product</NavLink>
       </li>
       {/* Signup */}
-      {/* <li>
-        <NavLink to={'/signup'}>Signup</NavLink>
-      </li> */}
+      {!user ? <li>
+        <Link to={'/signup'}>Signup</Link>
+      </li> : ""}
+      {/* Signup */}
+      {!user ? <li>
+        <Link to={'/login'}>Login</Link>
+      </li> : ""}
       {/* User */}
-      <li>
-        <NavLink to={'/userDashboard'}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-        </svg>
-        </NavLink>
-      </li>
+      {user?.role === "user" && <li>
+        <Link to={'/userDashboard'}>User</Link>
+      </li>}
       {/* Admin */}
-      {/* <li>
-            </li> */}
+      {user?.role === "admin" && <li>
+        <Link to={'/adminDashboard'}>Admin</Link>
+      </li>}
       {/* logout */}
-      {/* <li>
-            </li> */}
+      {user && <li className=" cursor-pointer" onClick={logout}>
+        logout
+      </li>}
       {/* Cart */}
       <li>
         <NavLink to={'/cart'}>

@@ -35,18 +35,17 @@ export const Login = () => {
                     let user;
                     QuerySnapshot.forEach((doc) => user = doc.data());
                     localStorage.setItem("user", JSON.stringify(user))
-                    // localStorage.setItem("user", JSON.stringify(user))
                     setUserLogin({
                         email: "",
                         password: ""
                     })
                     toast.success("Login Successfully");
-                    setLoading(false);
                     if (user.role === "user") {
                         navigate('/userDashboard');
                     } else {
                         navigate('/adminDashboard');
                     }
+                    setLoading(false);
                 });
                 return () => data;
             } catch (error) {
