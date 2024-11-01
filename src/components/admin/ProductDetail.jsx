@@ -1,10 +1,10 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MyContext } from "../../context/myContext";
 const ProductDetail = () => {
     const context = useContext(MyContext)
     const { loading, getAllProduct } = context
-    console.log(loading)
+    const navigat = useNavigate()
     return (
         <div>
             <div className="py-7 px-5 flex justify-between items-center">
@@ -52,7 +52,9 @@ const ProductDetail = () => {
                                     <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-dark stroke-slate-500 text-slate-500 first-letter:uppercase ">
                                         {date}
                                     </td>
-                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-dark stroke-slate-500 text-slate-500 text-green-500 cursor-pointer ">
+                                    <td
+                                        onClick={() => navigat(`/editProduct/${id}`)}
+                                        className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-dark stroke-slate-500 text-slate-500 text-green-500 cursor-pointer ">
                                         Edit
                                     </td>
                                     <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-dark stroke-slate-500 text-slate-500 text-red-500 cursor-pointer ">
