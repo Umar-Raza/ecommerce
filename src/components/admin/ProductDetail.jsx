@@ -1,10 +1,29 @@
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MyContext } from "../../context/myContext";
+import { deleteDoc, doc } from "firebase/firestore";
+import { firestore } from "../../config/Firebase";
+import toast from "react-hot-toast";
 const ProductDetail = () => {
     const context = useContext(MyContext)
-    const { loading, getAllProduct } = context
+    const { loading, setLoading, getAllProduct, getAllProductFunction } = context
     const navigat = useNavigate()
+
+    const deleteProduct = async (id) => {
+        setLoading(true)
+        try {
+            await deleteDoc(doc(firestore, 'products', id))
+            toast.success('Product Deleted successfully')
+            getAllProductFunction();
+            setLoading(false)
+        } catch (error) {
+            console.log(error)
+            setLoading(false)
+        }
+    }
+
+
+
     return (
         <div>
             <div className="py-7 px-5 flex justify-between items-center">
@@ -57,7 +76,11 @@ const ProductDetail = () => {
                                         className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-dark stroke-slate-500 text-slate-500 text-green-500 cursor-pointer ">
                                         Edit
                                     </td>
-                                    <td className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-dark stroke-slate-500 text-slate-500 text-red-500 cursor-pointer ">
+                                    <td onClick={(e) => {
+                                        confirm("Are you sure!")
+                                        deleteProduct(id)
+                                    }}
+                                        className="h-12 px-6 text-md transition duration-300 border-t border-l first:border-l-0 border-dark stroke-slate-500 text-slate-500 text-red-500 cursor-pointer ">
                                         Delete
                                     </td>
                                 </tr>
@@ -67,7 +90,6 @@ const ProductDetail = () => {
                 </div>
                 :
                 <div className="flex justify-center">
-
                     <svg className="text-dark animate-spin" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"
                         width="40" height="40">
                         <path
