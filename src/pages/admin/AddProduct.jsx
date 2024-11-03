@@ -2,9 +2,9 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MyContext } from "../../context/myContext";
 import { Timestamp, addDoc, collection } from "firebase/firestore";
-import { firestore, storage } from "../../config/Firebase";
+import { firestore } from "../../config/Firebase";
 import toast from "react-hot-toast";
-import { getDownloadURL, ref, uploadBytes, } from 'firebase/storage';
+
 
 const categoryList = [
   {
@@ -43,11 +43,12 @@ export const AddProduct = () => {
   const navigate = useNavigate();
 
   // product state
-  const [productImg, setProductImg] = useState()
+  const [url, setUrl] = useState("")
+  const [productImg, setProductImg] = useState(null)
   const [product, setProduct] = useState({
     title: "",
     price: "",
-    productImageUrl: "",
+    productImageUrl: url,
     category: "",
     description: "",
     quantity: 1,
@@ -63,76 +64,44 @@ export const AddProduct = () => {
   });
 
   const addProductFunction = async () => {
-    // if (product.title == "" || product.price == "" || product.productImageUrl == "" || product.category == "" || product.description == "") {
-    //   return toast.error("all fields are required")
-    // }
-    uploadImage()
+    if (product.title == "" || product.price == "" || product.product == "" || product.category == "" || product.description == "") {
+      return toast.error("all fields are required")
+    }
+    imagesStore()
+    setLoading(true);
+    try {
+      const productRef = collection(firestore, 'products');
+      await addDoc(productRef, product)
+      toast.success("Add product successfully");
+      navigate('/adminDashboard')
+      setLoading(false)
+    } catch (error) {
+      console.log(error);
+      setLoading(false)
+      toast.error("Add product failed");
+    }
+
   }
 
-  const uploadImage = async () => {
-    if (!productImg) return;
-    const imageRef = ref(storage, `productImgs/${productImg.name}`);
-    uploadBytes(imageRef, productImg).then((snapshot) => {
-      console.log(imageRef)
+  const imagesStore = async () => {
+    const data = new FormData();
+    data.append("file", productImg);
+    data.append("upload_preset", "ecommerce");
+    data.append("cloud_name", "umarecommerceimg");
 
-      getDownloadURL(snapshot.ref).then((url) => {
-        const productRef = collection(firestore, "products")
-        setLoading(true)
-        try {
-          addDoc(productRef, {
-            product,
-            productImg: url,
-            time: Timestamp.now(),
-            date: new Date().toLocaleString(
-              "en-US",
-              {
-                month: "short",
-                day: "2-digit",
-                year: "numeric",
-              }
-            )
-          })
-          toast.success("Add product successfully");
-          navigate('/adminDashboard')
-          setLoading(false)
-        } catch (error) {
-          toast.error(error)
-          console.log(error)
-        }
-      });
-    });
-    // const imageRef = ref(storage, `productImage/${productImg.name}`);
-    // uploadBytes(imageRef, productImg).then((snapshot) => {
-    //   getDownloadURL(snapshot.ref).then((url) => {
-    //     const productRef = collection(firestore, "products")
-    //     try {
-    //       addDoc(productRef, {
-    //         product,
-    //         productImg: url,
-    //         time: Timestamp.now(),
-    //         date: new Date().toLocaleString(
-    //           "en-US",
-    //           {
-    //             month: "short",
-    //             day: "2-digit",
-    //             year: "numeric",
-    //           }
-    //         )
-    //       })
-    //       toast.success("Add product successfully");
-    //       navigate('/adminDashboard')
-    //       setLoading(false)
-    //     } catch (error) {
-    //       console.log(error);
-
-    //       toast.error("Product is not add!");
-    //       setLoading(false)
-    //     }
-    //   });
-    // });
+    try {
+      const res = await fetch('https://api.cloudinary.com/v1_1/umarecommerceimg/image/upload', {
+        method: "POST",
+        body: data
+      })
+      const cloudData = await res.json();
+      setUrl(cloudData.url)
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-
+  console.log(url);
   return (
     <div className="bg-deep-purple-100">
       <div className='flex justify-center items-center h-screen'>
@@ -161,7 +130,6 @@ export const AddProduct = () => {
               required="2"
               placeholder='Product Title'
               className='bg-plane text-dark border border-dark px-2 py-2 w-96 rounded-md outline-none placeholder-dark'
-
             />
           </div>
 
@@ -183,28 +151,22 @@ export const AddProduct = () => {
 
           {/* Input Three  */}
           <div className="mb-3">
-            <input
-              type="text"
-              value={product.productImageUrl}
-              onChange={(e) => {
-                setProduct({
-                  ...product,
-                  productImageUrl: e.target.value
-                })
-              }}
-              placeholder='Product Image Url'
-              className='bg-plane text-dark border border-dark px-2 py-2 w-96 rounded-md outline-none placeholder-dark'
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <input
-              name="productImg"
-              type="file"
-              onChange={(e) => setProductImg(e.target.files[0])}
-              className='bg-plane text-dark border border-dark px-2 py-2 w-96 rounded-md outline-none placeholder-dark'
-              required
-            />
+            {productImg
+              ?
+              <img
+                className=" w-72 lg:w-96  rounded-xl"
+                src={productImg ? URL.createObjectURL(productImg) : ""}
+                alt="img"
+              />
+              :
+              <input
+                name="productImg"
+                type="file"
+                onChange={(e) => setProductImg(e.target.files[0])}
+                className='bg-plane text-dark border border-dark px-2 py-2 w-96 rounded-md outline-none placeholder-dark'
+                required
+              />
+            }
           </div>
           {/* Input Four  */}
           <div className="mb-3">

@@ -22,8 +22,6 @@ const ProductDetail = () => {
         }
     }
 
-
-
     return (
         <div>
             <div className="py-7 px-5 flex justify-between items-center">
