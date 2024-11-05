@@ -44,6 +44,7 @@ export const AddProduct = () => {
 
   // product state
   const [url, setUrl] = useState("")
+
   const [productImg, setProductImg] = useState(null)
   const [product, setProduct] = useState({
     title: "",
@@ -67,7 +68,7 @@ export const AddProduct = () => {
     if (product.title == "" || product.price == "" || product.product == "" || product.category == "" || product.description == "") {
       return toast.error("all fields are required")
     }
-    imagesStore()
+    await imagesStore()
     setLoading(true);
     try {
       const productRef = collection(firestore, 'products');
@@ -100,8 +101,9 @@ export const AddProduct = () => {
       console.log(error);
     }
   }
-
   console.log(url);
+
+
   return (
     <div className="bg-deep-purple-100">
       <div className='flex justify-center items-center h-screen'>
@@ -162,6 +164,7 @@ export const AddProduct = () => {
               <input
                 name="productImg"
                 type="file"
+                value={product.productImageUrl}
                 onChange={(e) => setProductImg(e.target.files[0])}
                 className='bg-plane text-dark border border-dark px-2 py-2 w-96 rounded-md outline-none placeholder-dark'
                 required
