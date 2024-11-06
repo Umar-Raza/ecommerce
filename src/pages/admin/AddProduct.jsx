@@ -35,6 +35,7 @@ const categoryList = [
     name: 'Food'
   }
 ]
+
 export const AddProduct = () => {
   const context = useContext(MyContext);
   const { loading, setLoading } = context;
@@ -43,13 +44,11 @@ export const AddProduct = () => {
   const navigate = useNavigate();
 
   // product state
-  const [url, setUrl] = useState("")
-
   const [productImg, setProductImg] = useState(null)
   const [product, setProduct] = useState({
     title: "",
     price: "",
-    productImageUrl: url,
+    productImageUrl: "",
     category: "",
     description: "",
     quantity: 1,
@@ -68,11 +67,14 @@ export const AddProduct = () => {
     if (product.title == "" || product.price == "" || product.product == "" || product.category == "" || product.description == "") {
       return toast.error("all fields are required")
     }
-    await imagesStore()
+
     setLoading(true);
     try {
+      await imagesStore();
+      // console.log(product)
+      // return
       const productRef = collection(firestore, 'products');
-      await addDoc(productRef, product)
+      await addDoc(productRef, { ...product })
       toast.success("Add product successfully");
       navigate('/adminDashboard')
       setLoading(false)
@@ -90,20 +92,14 @@ export const AddProduct = () => {
     data.append("upload_preset", "ecommerce");
     data.append("cloud_name", "umarecommerceimg");
 
-    try {
-      const res = await fetch('https://api.cloudinary.com/v1_1/umarecommerceimg/image/upload', {
-        method: "POST",
-        body: data
-      })
-      const cloudData = await res.json();
-      setUrl(cloudData.url)
-    } catch (error) {
-      console.log(error);
-    }
+    const res = await fetch('https://api.cloudinary.com/v1_1/umarecommerceimg/image/upload', {
+      method: "POST",
+      body: data
+    })
+    const cloudData = await res.json();
+    setProduct(pre => ({ ...pre, productImageUrl: cloudData.url }))
   }
-  console.log(url);
-
-
+  // console.log(product)
   return (
     <div className="bg-deep-purple-100">
       <div className='flex justify-center items-center h-screen'>
@@ -124,10 +120,10 @@ export const AddProduct = () => {
               name="title"
               value={product.title}
               onChange={(e) => {
-                setProduct({
+                setProduct(product => ({
                   ...product,
                   title: e.target.value
-                })
+                }))
               }}
               required="2"
               placeholder='Product Title'
@@ -141,10 +137,10 @@ export const AddProduct = () => {
               type="number"
               value={product.price}
               onChange={(e) => {
-                setProduct({
+                setProduct(product => ({
                   ...product,
                   price: e.target.value
-                })
+                }))
               }}
               placeholder='Product Price'
               className='bg-plane text-dark border border-dark px-2 py-2 w-96 rounded-md outline-none placeholder-dark'
@@ -164,8 +160,9 @@ export const AddProduct = () => {
               <input
                 name="productImg"
                 type="file"
-                value={product.productImageUrl}
-                onChange={(e) => setProductImg(e.target.files[0])}
+                onChange={(e) => setProductImg(product => (
+                  product,
+                  e.target.files[0]))}
                 className='bg-plane text-dark border border-dark px-2 py-2 w-96 rounded-md outline-none placeholder-dark'
                 required
               />
@@ -176,10 +173,10 @@ export const AddProduct = () => {
             <select
               value={product.category}
               onChange={(e) => {
-                setProduct({
+                setProduct(product => ({
                   ...product,
                   category: e.target.value
-                })
+                }))
               }}
               className="w-full px-1 py-2 text-sm rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-primary shadow-sm focus:shadow-md appearance-none cursor-pointer text-dark bg-plane border border-dark rounded-md outline-none">
               <option disabled>Select Product Category</option>
@@ -196,10 +193,10 @@ export const AddProduct = () => {
           <div className="mb-3">
             <textarea name="description" value={product.description}
               onChange={(e) => {
-                setProduct({
+                setProduct(product => ({
                   ...product,
                   description: e.target.value
-                })
+                }))
               }} placeholder="Product Description" rows="5" className=" w-full px-2 py-1 text-dark bg-plane border border-dark rounded-md outline-none placeholder-dark ">
 
             </textarea>
